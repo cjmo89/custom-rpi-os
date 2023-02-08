@@ -1,4 +1,5 @@
 build
+docs
 kernel8.img
 *.o
 *elf
