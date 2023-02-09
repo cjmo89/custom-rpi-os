@@ -1,5 +1,7 @@
 build
+armstub/build
 docs
-kernel8.img
+*.img
+*.bin
 *.o
 *elf
