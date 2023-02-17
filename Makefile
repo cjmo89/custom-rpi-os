@@ -1,5 +1,5 @@
 CC = aarch64-linux-gnu
-CFLAGS = -Wall -ffreestanding -nostdlib -nostartfiles -mgeneral-regs-only
+CFLAGS = -Wall -ffreestanding -nostdlib -nostartfiles -Iinclude -mgeneral-regs-only
 BUILD_DIR = build
 BOOT_DIR = /media/$$USER/boot
 

@@ -20,4 +20,4 @@ stub_version:
 .org 0xfc
 .globl kernel_entry32
 kernel_entry32:
-    .word 0x0       // start at the very beginning
+    .word 0x0       // start at the very beginning of the binary file
