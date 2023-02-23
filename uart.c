@@ -1,25 +1,9 @@
-#define GPIO_BASE 0xFE200000
-#define AUX_BASE 0xFE215000
+#include "base.h"
+#include "uart.h"
+
+
 #define ALT_5 2
 #include <stdint.h>
-
-enum {
-    GPFSEL0         = GPIO_BASE + 0x0,
-    GPFSEL1         = GPIO_BASE + 0x04,
-    GPIO_PUP_PDN0   = GPIO_BASE + 0xE4,
-};
-
-enum {
-    AUX_IRQ         = AUX_BASE + 0x0,
-    AUX_ENABLES     = AUX_BASE + 0x04,
-    AUX_MU_IO_REG   = AUX_BASE + 0x40,
-    AUX_MU_IER_REG  = AUX_BASE + 0x44,
-    AUX_MU_LCR_REG  = AUX_BASE + 0x4c,
-    AUX_MU_MCR_REG  = AUX_BASE + 0x50,
-    AUX_MU_LSR_REG  = AUX_BASE + 0x54,
-    AUX_MU_CNTL_REG = AUX_BASE + 0x60,
-    AUX_MU_BAUD_REG = AUX_BASE + 0x68,
-};
 
 void mmio_write(long reg, unsigned int val) {
     *(volatile unsigned int*) reg = val;
@@ -47,7 +31,7 @@ void uart_init() {
     mmio_write(GPIO_PUP_PDN0, 0);       // set pins as pull none
     mmio_write(AUX_ENABLES, 1);         // Enable mini UART
     mmio_write(AUX_MU_CNTL_REG, 0);     // Disable auto flow control and disable receiver and transmitter
-    mmio_write(AUX_MU_IER_REG, 0);      // Disable receive and transmit interrupts
+    mmio_write(AUX_MU_IER_REG, 2);      // Enable receive interrupts
     mmio_write(AUX_MU_LCR_REG, 3);      // Set the UART in 8-bit mode
     mmio_write(AUX_MU_MCR_REG, 0);      // Set the UART1_RTS line to be always high
     mmio_write(AUX_MU_BAUD_REG, 541);   // Set the baud rate to 115200 @ 500MHz
@@ -77,5 +61,23 @@ void uart_send_string(char* buffer) {
         }
         uart_send(*buffer);
         buffer++;
+    }
+}
+
+void uart_send_int(int64_t n) {
+    if (n < 0) {
+        uart_send(45);  // - in ASCII
+        n *= -1;
+    }
+    char digits[19];    // max signed int64 value is 19 digits long
+    int count = 0;
+    do {
+        digits[count] = n % 10;
+        count++;
+        n /= 10;
+    } while (n > 0);
+    while (count > 0) {
+        uart_send(digits[count - 1] + 48);  // +48 converts digit to ASCII
+        count--;
     }
 }

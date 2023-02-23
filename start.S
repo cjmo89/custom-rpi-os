@@ -1,8 +1,8 @@
 #include "sysregs.h"
+
 .section ".text.boot" 
 // Execution starts here
 .global _start
-
 _start:
     // proceed only with processor ID 0, park the others
     mrs     x1, mpidr_el1
